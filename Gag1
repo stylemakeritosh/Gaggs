@@ -1651,8 +1651,8 @@ SpawnerTab:CreateButton({
         end)
     end
 })
-SpawnerTab:CreateLabel("Credits to @ah_punisher")
-SpawnerTab:CreateLabel("This is just Visual. It's not real")
+SpawnerTab:CreateLabel("Credits to @rintoshiii")
+SpawnerTab:CreateLabel("This is just Visual. ITS NOT REAL!")
 
 -- Visuals Tab
 VisualsTab:CreateSection("ESP")
