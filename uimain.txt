@@ -184,7 +184,7 @@ function Update:StartLoad()
 	MainLoaderFrame.BorderSizePixel = 0;
 	local TitleLoader = Instance.new("TextLabel");
 	TitleLoader.Parent = MainLoaderFrame;
-	TitleLoader.Text = "STELLAR";
+	TitleLoader.Text = "Souls Hub";
 	TitleLoader.Font = Enum.Font.FredokaOne;
 	TitleLoader.TextSize = 50;
 	TitleLoader.TextColor3 = Color3.fromRGB(255, 255, 255);
@@ -321,7 +321,7 @@ function Update:Window(Config)
 	local keybind = keybind or Enum.KeyCode.RightControl;
 	local yoo = string.gsub(tostring(keybind), "Enum.KeyCode.", "");
 	local STELLAR = Instance.new("ScreenGui");
-	STELLAR.Name = "STELLAR";
+	STELLAR.Name = "Souls Hub";
 	STELLAR.Parent = game.CoreGui;
 	STELLAR.DisplayOrder = 999;
 	local OutlineMain = Instance.new("Frame");
