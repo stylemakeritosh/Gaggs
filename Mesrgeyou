@@ -1,0 +1,154 @@
+--== Initialization ==--
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Wait for LocalPlayer
+local player
+repeat
+    player = Players.LocalPlayer
+    if not player then
+        task.wait(0.1)
+    end
+until player
+
+-- Load UI Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/x2zu/OPEN-SOURCE-UI-ROBLOX/refs/heads/main/X2ZU%20UI%20ROBLOX%20OPEN%20SOURCE/DummyUi-leak-by-x2zu/fetching-main/Tools/Framework.luau"))()
+
+-- Create Main Window
+local Window = Library:Window({
+    Title = "Souls Hub",
+    Desc = "by rintoshiii",
+    Icon = "star",
+    Theme = "Dark",
+    Config = {
+        Keybind = Enum.KeyCode.LeftControl,
+        Size = UDim2.new(0, 530, 0, 400)
+    },
+    CloseUIButton = {
+        Enabled = true,
+        Text = "Close UI"
+    }
+})
+
+-- Sidebar Vertical Separator
+local SidebarLine = Instance.new("Frame")
+SidebarLine.Size = UDim2.new(0, 1, 1, 0)
+SidebarLine.Position = UDim2.new(0, 140, 0, 0)
+SidebarLine.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SidebarLine.BorderSizePixel = 0
+SidebarLine.ZIndex = 5
+SidebarLine.Name = "SidebarLine"
+SidebarLine.Parent = game:GetService("CoreGui")
+
+-- Auto Rebirth Variables
+local autoRebirthEnabled = false
+local autoRebirthTask = nil
+
+-- Main Tab
+local MainTab = Window:Tab({Title = "Main", Icon = "home"}) do
+    MainTab:Section({Title = "Player Enhancements"})
+
+    -- Textbox for Cash Amount
+    local cashAmount = "69" -- Default value
+    MainTab:Textbox({
+        Title = "Cash Amount",
+        Desc = "Enter the amount of cash to add",
+        Placeholder = "Enter cash amount",
+        Value = cashAmount,
+        ClearTextOnFocus = false,
+        Callback = function(text)
+            cashAmount = text
+        end
+    })
+
+    -- Button to Add Cash
+    MainTab:Button({
+        Title = "Get Money",
+        Desc = "Add the specified amount of cash",
+        Callback = function()
+            local args = {
+                "Cash",
+                tonumber(cashAmount) or 69
+            }
+            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AddValueEvent"):FireServer(unpack(args))
+            Window:Notify({
+                Title = "Cash Added",
+                Desc = "Attempted to add " .. cashAmount .. " cash!",
+                Time = 3
+            })
+        end
+    })
+
+    -- Button for Free Rebirth
+    MainTab:Button({
+        Title = "Free Rebirth",
+        Desc = "Trigger a free rebirth",
+        Callback = function()
+            local args = {
+                0,
+                0,
+                150
+            }
+            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RebirthConfirmEvent"):FireServer(unpack(args))
+            Window:Notify({
+                Title = "Rebirth",
+                Desc = "Free rebirth triggered!",
+                Time = 3
+            })
+        end
+    })
+
+    -- Toggle for Auto Rebirth
+    MainTab:Toggle({
+        Title = "Auto Rebirth",
+        Desc = "Enable to automatically trigger rebirth every 0.1 seconds",
+        Value = false,
+        Callback = function(value)
+            autoRebirthEnabled = value
+            if autoRebirthEnabled then
+                autoRebirthTask = task.spawn(function()
+                    while autoRebirthEnabled do
+                        local args = {
+                            0,
+                            0,
+                            150
+                        }
+                        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RebirthConfirmEvent"):FireServer(unpack(args))
+                        task.wait(0.1)
+                    end
+                end)
+                Window:Notify({
+                    Title = "Auto Rebirth",
+                    Desc = "Auto rebirth enabled!",
+                    Time = 3
+                })
+            else
+                if autoRebirthTask then
+                    task.cancel(autoRebirthTask)
+                    autoRebirthTask = nil
+                end
+                Window:Notify({
+                    Title = "Auto Rebirth",
+                    Desc = "Auto rebirth disabled!",
+                    Time = 3
+                })
+            end
+        end
+    })
+end
+
+-- Info Tab
+local InfoTab = Window:Tab({Title = "Info", Icon = "info-circle"}) do
+    InfoTab:Section({Title = "Info"})
+    InfoTab:Label({Title = "Souls Hub", Desc = "Thanks for using Souls Hub :D"})
+
+    InfoTab:Section({Title = "Creator"})
+    InfoTab:Label({Title = "Made by rintoshiii", Desc = "merge mwrge"})
+end
+
+-- Final Notification
+Window:Notify({
+    Title = "Souls Hub Loaded",
+    Desc = "Script loaded successfully!",
+    Time = 4
+})
