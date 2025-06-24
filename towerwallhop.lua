@@ -521,7 +521,7 @@ local SettingsTab = Window:Tab({Title = "Settings", Icon = "cog"}) do
     local AntiVoidEnabled = false
     SettingsTab:Toggle({
         Title = "Anti-Void",
-        Value = true,
+        Value = false,
         Callback = function(Value)
             AntiVoidEnabled = Value
         end
