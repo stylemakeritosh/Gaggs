@@ -1,0 +1,127 @@
+--== Initialization ==--
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+-- Wait for LocalPlayer
+local player
+repeat
+    player = Players.LocalPlayer
+    if not player then
+        task.wait(0.1)
+    end
+until player
+
+-- Load UI Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/x2zu/OPEN-SOURCE-UI-ROBLOX/refs/heads/main/X2ZU%20UI%20ROBLOX%20OPEN%20SOURCE/DummyUi-leak-by-x2zu/fetching-main/Tools/Framework.luau"))()
+
+-- Create Main Window
+local Window = Library:Window({
+    Title = "Souls Hub",
+    Desc = "by rintoshiii",
+    Icon = "door-open",
+    Theme = "Dark",
+    Config = {
+        Keybind = Enum.KeyCode.LeftControl,
+        Size = UDim2.new(0, 530, 0, 400)
+    },
+    CloseUIButton = {
+        Enabled = true,
+        Text = "Close UI"
+    }
+})
+
+-- Info Tab
+local InfoTab = Window:Tab({Title = "Info", Icon = "info-circle"}) do
+    InfoTab:Section({Title = "Info"})
+    InfoTab:Label({Title = "Souls Hub for " .. player.Name, Desc = "Thanks for using our script!"})
+
+    InfoTab:Section({Title = "Creator"})
+    InfoTab:Label({Title = "Made by rintoshii", Desc = "@rintoshiii"})
+    InfoTab:Label({Title = "Souls Hub", Desc = "Join Dc"})
+    InfoTab:Label({Title = "https://discord.gg/QG5PHd7mVD", Desc = "Join for more"})
+
+    InfoTab:Section({Title = "Links (Socials)"})
+    InfoTab:Button({
+        Title = "Your Discord",
+        Callback = function()
+            setclipboard("@rintoshiii")
+        end
+    })
+    InfoTab:Button({
+        Title = "Click to Join Discord",
+        Callback = function()
+            setclipboard("https://discord.gg/QG5PHd7mVD")
+        end
+    })
+end
+
+-- Main Tab
+local MainTab = Window:Tab({Title = "Main", Icon = "home"}) do
+    MainTab:Section({Title = "Base Controls"})
+
+    MainTab:Button({
+        Title = "Lock Base",
+        Callback = function()
+            ReplicatedStorage.Remotes.Server.LockGate:FireServer()
+        end
+    })
+
+    local autoLockLoop
+    MainTab:Toggle({
+        Title = "Auto Lock",
+        Desc = "Automatically locks the base",
+        Value = false,
+        Callback = function(state)
+            if state then
+                autoLockLoop = RunService.Heartbeat:Connect(function()
+                    ReplicatedStorage.Remotes.Server.LockGate:FireServer()
+                    task.wait(2)
+                end)
+            else
+                if autoLockLoop then
+                    autoLockLoop:Disconnect()
+                    autoLockLoop = nil
+                end
+            end
+        end
+    })
+
+    MainTab:Button({
+        Title = "Collect Money",
+        Callback = function()
+            for i = 1, 10 do
+                ReplicatedStorage.Remotes.Server.CollectEarnings:FireServer("Earnings" .. i)
+            end
+        end
+    })
+
+    local autoCollectLoop
+    MainTab:Toggle({
+        Title = "Auto Collect",
+        Desc = "Automatically collects earnings",
+        Value = false,
+        Callback = function(state)
+            if state then
+                autoCollectLoop = RunService.Heartbeat:Connect(function()
+                    for i = 1, 10 do
+                        ReplicatedStorage.Remotes.Server.CollectEarnings:FireServer("Earnings" .. i)
+                    end
+                    task.wait(2)
+                end)
+            else
+                if autoCollectLoop then
+                    autoCollectLoop:Disconnect()
+                    autoCollectLoop = nil
+                end
+            end
+        end
+    })
+end
+
+-- Final Notification
+Window:Notify({
+    Title = "Souls Hub Loaded",
+    Desc = "Script loaded successfully!",
+    Time = 4
+})
