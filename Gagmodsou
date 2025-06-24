@@ -1,0 +1,170 @@
+--== Initialization ==--
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+-- Wait for LocalPlayer
+local player
+repeat
+    player = Players.LocalPlayer
+    if not player then
+        task.wait(0.1)
+    end
+until player
+
+-- Load UI Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/x2zu/OPEN-SOURCE-UI-ROBLOX/refs/heads/main/X2ZU%20UI%20ROBLOX%20OPEN%20SOURCE/DummyUi-leak-by-x2zu/fetching-main/Tools/Framework.luau"))()
+
+-- Create Main Window
+local Window = Library:Window({
+    Title = "Souls Hub | Gag Modded",
+    Desc = "by Rintoshiii",
+    Icon = "apple-whole",
+    Theme = "Dark",
+    Config = {
+        Keybind = Enum.KeyCode.LeftControl,
+        Size = UDim2.new(0, 530, 0, 400)
+    },
+    CloseUIButton = {
+        Enabled = true,
+        Text = "Close UI"
+    }
+})
+
+-- Main Tab
+local MainTab = Window:Tab({Title = "Main", Icon = "home"}) do
+    MainTab:Section({Title = "Fruit Dupe"})
+
+    local dupeAmount = 1
+    MainTab:Dropdown({
+        Title = "Dupe Amount",
+        Desc = "Select the number of fruits to dupe (1-500). Only turn on if the plant 'Collect' is visible, but don't click collect.",
+        List = (function()
+            local list = {}
+            for i = 1, 500 do
+                table.insert(list, tostring(i))
+            end
+            return list
+        end)(),
+        Value = "1",
+        Callback = function(Value)
+            dupeAmount = tonumber(Value)
+        end
+    })
+
+    MainTab:Button({
+        Title = "Dupe Fruit",
+        Callback = function()
+            local settings = {
+                dupe_amount = dupeAmount,
+                plot = nil
+            }
+
+            local farms = Workspace:FindFirstChild("Farm")
+            if farms then
+                for _, v in farms:GetDescendants() do
+                    if v.Name == "Owner" and v.Value == player.Name then
+                        settings.plot = v.Parent.Parent
+                        break
+                    end
+                end
+            end
+
+            if settings.plot then
+                local plant_physical = settings.plot:FindFirstChild("Plants_Physical")
+                if plant_physical then
+                    local function closest_plant()
+                        local plant = nil
+                        local dist = 9e99
+                        for _, v in plant_physical:GetDescendants() do
+                            if v:IsA("ProximityPrompt") and v.Parent then
+                                local distance = (v.Parent.Parent:GetPivot().Position - player.Character:GetPivot().Position).Magnitude
+                                if distance < dist then
+                                    dist = distance
+                                    plant = v.Parent.Parent
+                                end
+                            end
+                        end
+                        return plant
+                    end
+
+                    local plant = closest_plant()
+                    if plant then
+                        for i = 1, settings.dupe_amount do
+                            ReplicatedStorage:WaitForChild("BLINK_UNRELIABLE_REMOTE"):FireServer(buffer.fromstring("\000\001\000\001"), { plant })
+                        end
+                        Window:Notify({
+                            Title = "Success",
+                            Desc = "Successfully Duped " .. settings.dupe_amount .. " of these fruits. - Souls Hub",
+                            Time = 5
+                        })
+                    else
+                        Window:Notify({
+                            Title = "Error",
+                            Desc = "No valid plant found to dupe. Ensure 'Collect' is visible.",
+                            Time = 5
+                        })
+                    end
+                else
+                    Window:Notify({
+                        Title = "Error",
+                        Desc = "Plants_Physical not found in your plot.",
+                        Time = 5
+                    })
+                end
+            else
+                Window:Notify({
+                    Title = "Error",
+                    Desc = "No plot found owned by you.",
+                    Time = 5
+                })
+            end
+        end
+    })
+end
+
+-- Info Tab
+local InfoTab = Window:Tab({Title = "Info", Icon = "info-circle"}) do
+    InfoTab:Section({Title = "Info"})
+    InfoTab:Label({Title = "Fruit Dupe Script for " .. player.Name, Desc = "Thanks for using Souls Hub :D"})
+
+    InfoTab:Section({Title = "Creator"})
+    InfoTab:Label({Title = "Made by Rin", Desc = "My Discord: rintoshiii"})
+    InfoTab:Label({Title = "Souls Hub", Desc = "Made by Rin and Souls"})
+    InfoTab:Label({Title = "https://discord.gg/QG5PHd7mVD", Desc = "Join for more"})
+
+    InfoTab:Section({Title = "Links (Socials)"})
+    InfoTab:Button({
+        Title = "Discord (Co-Owner) (Rintoshiii)",
+        Callback = function()
+            setclipboard("@rintoshiii")
+        end
+    })
+    InfoTab:Button({
+        Title = "Souls (Owner) (soulshub_)",
+        Callback = function()
+            setclipboard("@soulshub_")
+        end
+    })
+
+    InfoTab:Section({Title = "Discord Link"})
+    InfoTab:Button({
+        Title = "Click to Join Discord",
+        Callback = function()
+            setclipboard("https://discord.gg/QG5PHd7mVD")
+        end
+    })
+    InfoTab:Button({
+        Title = "More Scripts Soon, So Join :)",
+        Callback = function()
+            setclipboard("oke")
+        end
+    })
+end
+
+-- Final Notification
+Window:Notify({
+    Title = "Souls Hub Loaded",
+    Desc = "Fruit Dupe Script loaded successfully!",
+    Time = 4
+})
