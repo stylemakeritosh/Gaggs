@@ -1,0 +1,361 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/x2zu/OPEN-SOURCE-UI-ROBLOX/refs/heads/main/X2ZU%20UI%20ROBLOX%20OPEN%20SOURCE/DummyUi-leak-by-x2zu/fetching-main/Tools/Framework.luau"))()
+
+local Window = Library:Window({
+    Title = "Souls Hub - Forsaken",
+    Desc = "Script By Rintoshiii",
+    Icon = "rewind",
+    Theme = "Dark",
+    Config = {
+        Keybind = Enum.KeyCode.LeftControl,
+        Size = UDim2.new(0, 530, 0, 400)
+    },
+    CloseUIButton = {
+        Enabled = true,
+        Text = "Close UI"
+    }
+})
+
+local PlayerTab = Window:Tab({Title = "Player", Icon = "user"})
+local EspTab = Window:Tab({Title = "Esp", Icon = "eye"})
+local SettingsTab = Window:Tab({Title = "Settings", Icon = "cog"})
+
+-- Define colors
+local colors = {
+    ["Red"] = Color3.fromRGB(255, 0, 0),
+    ["Green"] = Color3.fromRGB(0, 255, 0),
+    ["Blue"] = Color3.fromRGB(0, 0, 255),
+    ["Yellow"] = Color3.fromRGB(255, 255, 0),
+    ["Cyan"] = Color3.fromRGB(0, 255, 255),
+    ["Magenta"] = Color3.fromRGB(255, 0, 255),
+    ["White"] = Color3.fromRGB(255, 255, 255),
+    ["Black"] = Color3.fromRGB(0, 0, 0),
+    ["Orange"] = Color3.fromRGB(255, 165, 0),
+    ["Purple"] = Color3.fromRGB(128, 0, 128),
+    ["Pink"] = Color3.fromRGB(255, 192, 203),
+    ["Brown"] = Color3.fromRGB(165, 42, 42),
+    ["Gray"] = Color3.fromRGB(128, 128, 128),
+    ["Lime"] = Color3.fromRGB(0, 255, 0),
+    ["Teal"] = Color3.fromRGB(0, 128, 128),
+    ["Indigo"] = Color3.fromRGB(75, 0, 130),
+    ["Violet"] = Color3.fromRGB(238, 130, 238),
+    ["Gold"] = Color3.fromRGB(255, 215, 0),
+    ["Silver"] = Color3.fromRGB(192, 192, 192),
+    ["Beige"] = Color3.fromRGB(245, 245, 220),
+    ["Coral"] = Color3.fromRGB(255, 127, 127),
+    ["Maroon"] = Color3.fromRGB(128, 0, 0),
+    ["Olive"] = Color3.fromRGB(128, 128, 0),
+    ["Navy"] = Color3.fromRGB(0, 0, 128),
+    ["Crimson"] = Color3.fromRGB(220, 20, 60),
+    ["Mint"] = Color3.fromRGB(152, 255, 152),
+    ["Lavender"] = Color3.fromRGB(230, 230, 250),
+    ["Salmon"] = Color3.fromRGB(250, 128, 114),
+    ["Hot Pink"] = Color3.fromRGB(255, 0, 128)
+}
+
+local colorList = {
+    "Red", "Green", "Blue", "Yellow", "Cyan", "Magenta", "White", "Black", "Orange", "Purple", "Pink", "Brown", "Gray",
+    "Lime", "Teal", "Indigo", "Violet", "Gold", "Silver", "Beige", "Coral", "Maroon", "Olive", "Navy", "Crimson", "Mint",
+    "Lavender", "Salmon", "Hot Pink"
+}
+
+-- Variables for ESP states and colors
+local ActiveEspSurvivors = false
+local ActiveEspKillers = false
+local ActiveEspGenerator = false
+local ActiveEspItems = false
+
+local survivorEspColor = "Green"
+local killerEspColor = "Red"
+local generatorEspColor = "Yellow"
+local itemEspColor = "Blue"
+
+-- ESP Functions
+local function CreateEsp(Char, Color)
+    if Char then
+        local NewHighlight = Instance.new("Highlight", Char)
+        NewHighlight.OutlineColor = Color
+        NewHighlight.FillColor = Color
+    end
+end
+
+local function KeepEsp(Char)
+    if Char and Char:FindFirstChildOfClass("Highlight") then
+        Char:FindFirstChildOfClass("Highlight"):Destroy()
+    end
+end
+
+-- ESP Sections
+EspTab:Section({Title = "Survivors ESP"})
+EspTab:Toggle({
+    Title = "Survivors",
+    Desc = "Enable ESP for survivors",
+    Value = false,
+    Callback = function(Value)
+        ActiveEspSurvivors = Value
+        task.spawn(function()
+            while ActiveEspSurvivors do
+                task.spawn(function()
+                    for _, Players in pairs(game.Workspace.Players.Survivors:GetChildren()) do
+                        if Players:IsA("Model") and not Players:FindFirstChildOfClass("Highlight") then
+                            CreateEsp(Players, colors[survivorEspColor])
+                        end
+                    end
+                end)
+                task.wait(0.1)
+            end
+            for _, Players in pairs(game.Workspace.Players.Survivors:GetChildren()) do
+                if Players:IsA("Model") and Players:FindFirstChildOfClass("Highlight") then
+                    KeepEsp(Players)
+                end
+            end
+        end)
+    end
+})
+EspTab:Dropdown({
+    Title = "Color",
+    Desc = "Select color (editable only when ESP is off)",
+    List = colorList,
+    Value = survivorEspColor,
+    Callback = function(Value)
+        if not ActiveEspSurvivors then
+            survivorEspColor = Value
+        else
+            Window:Notify({
+                Title = "Color Change Blocked",
+                Desc = "Turn off Survivors ESP to change color.",
+                Time = 2
+            })
+        end
+    end
+})
+
+EspTab:Section({Title = "Killers ESP"})
+EspTab:Toggle({
+    Title = "Killers",
+    Desc = "Enable ESP for killers",
+    Value = false,
+    Callback = function(Value)
+        ActiveEspKillers = Value
+        task.spawn(function()
+            while ActiveEspKillers do
+                task.spawn(function()
+                    for _, Players in pairs(game.Workspace.Players.Killers:GetChildren()) do
+                        if Players:IsA("Model") and not Players:FindFirstChildOfClass("Highlight") then
+                            CreateEsp(Players, colors[killerEspColor])
+                        end
+                    end
+                end)
+                task.wait(0.1)
+            end
+            for _, Players in pairs(game.Workspace.Players.Killers:GetChildren()) do
+                if Players:IsA("Model") and Players:FindFirstChildOfClass("Highlight") then
+                    KeepEsp(Players)
+                end
+            end
+        end)
+    end
+})
+EspTab:Dropdown({
+    Title = "Color",
+    Desc = "Select color (editable only when ESP is off)",
+    List = colorList,
+    Value = killerEspColor,
+    Callback = function(Value)
+        if not ActiveEspKillers then
+            killerEspColor = Value
+        else
+            Window:Notify({
+                Title = "Color Change Blocked",
+                Desc = "Turn off Killers ESP to change color.",
+                Time = 2
+            })
+        end
+    end
+})
+
+EspTab:Section({Title = "Generators ESP"})
+EspTab:Toggle({
+    Title = "Generators",
+    Desc = "Enable ESP for generators",
+    Value = false,
+    Callback = function(Value)
+        ActiveEspGenerator = Value
+        task.spawn(function()
+            while ActiveEspGenerator do
+                if game.Workspace.Map.Ingame:FindFirstChild("Map") then
+                    for _, obj in pairs(game.Workspace.Map.Ingame:FindFirstChild("Map"):GetChildren()) do
+                        if obj:IsA("Model") and obj.Name == "Generator" and not obj:FindFirstChildOfClass("Highlight") then
+                            CreateEsp(obj, colors[generatorEspColor])
+                        end
+                    end
+                end
+                task.wait(0.1)
+            end
+            if game.Workspace.Map.Ingame:FindFirstChild("Map") then
+                for _, obj in pairs(game.Workspace.Map.Ingame:FindFirstChild("Map"):GetChildren()) do
+                    if obj:IsA("Model") and obj.Name == "Generator" and obj:FindFirstChildOfClass("Highlight") then
+                        KeepEsp(obj)
+                    end
+                end
+            end
+        end)
+    end
+})
+EspTab:Dropdown({
+    Title = "Color",
+    Desc = "Select color (editable only when ESP is off)",
+    List = colorList,
+    Value = generatorEspColor,
+    Callback = function(Value)
+        if not ActiveEspGenerator then
+            generatorEspColor = Value
+        else
+            Window:Notify({
+                Title = "Color Change Blocked",
+                Desc = "Turn off Generators ESP to change color.",
+                Time = 2
+            })
+        end
+    end
+})
+
+EspTab:Section({Title = "Items ESP"})
+EspTab:Toggle({
+    Title = "Items",
+    Desc = "Enable ESP for items",
+    Value = false,
+    Callback = function(Value)
+        ActiveEspItems = Value
+        task.spawn(function()
+            while ActiveEspItems do
+                for _, obj in pairs(game.Workspace.Map.Ingame:GetChildren()) do
+                    if obj:IsA("Tool") and not obj:FindFirstChildOfClass("Highlight") then
+                        CreateEsp(obj, colors[itemEspColor])
+                    end
+                end
+                task.wait(0.1)
+            end
+            for _, obj in pairs(game.Workspace.Map.Ingame:GetChildren()) do
+                if obj:IsA("Tool") and obj:FindFirstChildOfClass("Highlight") then
+                    KeepEsp(obj)
+                end
+            end
+        end)
+    end
+})
+EspTab:Dropdown({
+    Title = "Color",
+    Desc = "Select color (editable only when ESP is off)",
+    List = colorList,
+    Value = itemEspColor,
+    Callback = function(Value)
+        if not ActiveEspItems then
+            itemEspColor = Value
+        else
+            Window:Notify({
+                Title = "Color Change Blocked",
+                Desc = "Turn off Items ESP to change color.",
+                Time = 2
+            })
+        end
+    end
+})
+
+-- Player Tab
+local ValueSpeed = 16
+PlayerTab:Slider({
+    Title = "Player Speed",
+    Min = 0,
+    Max = 25,
+    Rounding = 0,
+    Value = 16,
+    Callback = function(Value)
+        ValueSpeed = Value
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "Active Modifying Player Speed",
+    Desc = "Enable to set player speed to the selected value",
+    Value = false,
+    Callback = function(Value)
+        ActiveSpeedBoost = Value
+        task.spawn(function()
+            while ActiveSpeedBoost do
+                task.spawn(function()
+                    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+                        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = ValueSpeed
+                        game.Players.LocalPlayer.Character.Humanoid:SetAttribute("BaseSpeed", ValueSpeed)
+                    end
+                end)
+                task.wait(0.1)
+            end
+        end)
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "Infinite Stamina (Not Tested!)",
+    Desc = "Enable infinite stamina",
+    Value = false,
+    Callback = function(Value)
+        _G.InfStamina = Value
+        task.spawn(function()
+            while _G.InfStamina do
+                local staminaModule = require(game.ReplicatedStorage:WaitForChild("Systems"):WaitForChild("Character"):WaitForChild("Game"):WaitForChild("Sprinting"))
+                if staminaModule then
+                    staminaModule.MaxStamina = 999999
+                    staminaModule.Stamina = 999999
+                    staminaModule.__staminaChangedEvent:Fire(staminaModule.Stamina)
+                end
+                task.wait()
+            end
+        end)
+    end
+})
+
+PlayerTab:Toggle({
+    Title = "Auto Kill Survivors (Not Tested!)",
+    Desc = "Automatically kill survivors",
+    Value = false,
+    Callback = function(Value)
+        ActiveAutoKillSurvivors = Value
+        task.spawn(function()
+            while ActiveAutoKillSurvivors do
+                task.spawn(function()
+                    for _, Players in pairs(game.Workspace.Players.Survivors:GetChildren()) do
+                        if Players:IsA("Model") and Players:FindFirstChild("HumanoidRootPart") then
+                            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = Players.HumanoidRootPart.CFrame
+                                task.spawn(function()
+                                    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+                                    local RemoteEvent = ReplicatedStorage.Modules.Network.RemoteEvent
+                                    RemoteEvent:FireServer("UseActorAbility", "Slash")
+                                    wait(2.5)
+                                end)
+                            end
+                        end
+                    end
+                end)
+                task.wait(0.1)
+            end
+        end)
+    end
+})
+
+-- Settings Tab
+SettingsTab:Button({
+    Title = "Unload Menu",
+    Callback = function()
+        local ScreenGui = game:GetService("CoreGui"):FindFirstChild("Dummy Kawaii") or game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Dummy Kawaii")
+        if ScreenGui then
+            ScreenGui:Destroy()
+        end
+    end
+})
+
+Window:Notify({
+    Title = "Souls Hub - Forsaken",
+    Desc = "ESP Colors Editable",
+    Time = 2.5
+})
